@@ -1,34 +1,58 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Put,
+  Delete,
+  Get,
+  Body,
+  Param,
+  UseGuards,
+  Request,
+  Query,
+  Post,
+  Req,
+  Patch,
+} from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthGuard } from 'src/common/guards/auth.guard';
+// import { Roles } from '../auth/roles.decorator';
+import { User, UserRole } from 'src/schemas/user.schema';
+import { Roles } from 'src/common/decorators/role.decorator';
 
-@Controller('user')
+@Controller('users')
+@UseGuards(AuthGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  @Patch('/profile')
+  async updateProfile(@Req() req, @Body() updateData: Partial<User>) {
+    return this.userService.updateProfile(req.user.userId, updateData);
+  }
+
+  @Get('/profile')
+  async getProfile(@Req() req) {
+    console.log('User ID from token:', req.user.userId);
+
+    return this.userService.getUserProfile(req.user.userId);
+  }
+  @Delete('account')
+  async deleteAccount(@Req() req, @Body() { password }: { password: string }) {
+    return this.userService.deleteAccount(req.user.userId, password);
   }
 
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  @Roles(UserRole.ORGANIZER)
+  async listUsers(
+    @Req() req,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    console.log('Request User:', req.user);
+
+    return this.userService.listUsers(req.user.role, page, limit);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+  @Post('logout')
+  async logout(@Request() req) {
+    return this.userService.logout(req.user.userId);
   }
 }
