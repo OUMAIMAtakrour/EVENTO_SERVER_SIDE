@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { EventDocument, Events, EventsSchema } from 'src/schemas/events.schema';
+import { EventDocument, Events } from '../schemas/events.schema';
 import { Model, Types } from 'mongoose';
 import { User } from 'src/schemas/user.schema';
 import { UserModule } from 'src/core/user/user.module';
@@ -67,7 +67,7 @@ export class EventsService {
     return event;
   }
 
-  public async remove(id: string, userId: string): Promise<EventDocument> {
+  async remove(id: string, userId: string) {
     const deletedEvent = await this.eventModel
       .findOneAndDelete({
         _id: id,
@@ -81,6 +81,6 @@ export class EventsService {
       );
     }
 
-    return deletedEvent;
+    return { message: 'event deleted' };
   }
 }

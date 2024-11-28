@@ -16,12 +16,13 @@ import { AuthGuard } from 'src/common/guards/auth.guard';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { UserRole } from 'src/schemas/user.schema';
+import { RolesGuard } from 'src/common/guards/roles.guard';
 
 @Controller('events')
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
   @Post()
   @Roles(UserRole.ORGANIZER)
   async create(@Body() createEventDto: CreateEventDto, @CurrentUser() user) {
