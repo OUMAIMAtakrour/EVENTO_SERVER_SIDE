@@ -8,6 +8,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 // import { config } from 'process';
+import { EventsModule } from './events/events.module';
 import config from './config/config';
 
 @Module({
@@ -23,6 +24,8 @@ import config from './config/config';
         secret: config.get('jwt.secret'),
       }),
       global:true,
+
+
       inject:[ConfigService]
     }),
     MongooseModule.forRootAsync({
@@ -34,6 +37,7 @@ import config from './config/config';
     }),
     UserModule,
     AuthModule,
+    EventsModule,
   ],
 
   controllers: [],
