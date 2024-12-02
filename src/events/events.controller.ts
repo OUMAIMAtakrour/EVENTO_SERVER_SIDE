@@ -49,7 +49,7 @@ export class EventsController {
   }
   @UseGuards(AuthGuard)
   @Delete(':id')
-  @Roles(UserRole.ORGANIZER)
+  // @Roles(UserRole.ORGANIZER)
   remove(@Param('id') id: string, @CurrentUser() user) {
     return this.eventsService.remove(id, user.userId);
   }

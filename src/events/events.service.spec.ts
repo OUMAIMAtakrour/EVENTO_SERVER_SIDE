@@ -14,7 +14,7 @@ describe('EventsService', () => {
   };
 
   const mockUser = {
-    userId: '60d5ecb8b3b3a3001f3e2d2a', // example MongoDB ObjectId
+    userId: '60d5ecb8b3b3a3001f3e2d2a', 
     role: 'user',
   };
 
@@ -48,7 +48,7 @@ describe('EventsService', () => {
 
   describe('createNewEvent', () => {
     it('should create a new event successfully', async () => {
-      // Prepare mock implementation
+     
       const mockSavedEvent = {
         ...createEventDto,
         _id: '60d5ecb8b3b3a3001f3e2d2d',
@@ -63,19 +63,16 @@ describe('EventsService', () => {
 
       mockEventModel.save.mockResolvedValue(mockSavedEvent);
 
-      // Execute the method
       const result = await service.createNewEvent(
         createEventDto,
         mockUser.userId,
       );
 
-      // Assertions
       expect(result).toBeDefined();
       expect(result.title).toBe(createEventDto.title.toLowerCase());
       expect(result.Owner.toString()).toBe(mockUser.userId);
       expect(result.members).toEqual(createEventDto.members);
 
-      // Verify model interactions
       expect(mockEventModel.new).toHaveBeenCalledWith(
         expect.objectContaining({
           ...createEventDto,
@@ -87,14 +84,13 @@ describe('EventsService', () => {
     });
 
     it('should handle validation errors', async () => {
-      // Prepare an invalid DTO
       const invalidDto = {
-        title: '', // Empty title should fail
+        title: '',
         description: 'Test description',
         members: [],
       };
 
-      // Expect the validation to throw an error
+      
       await expect(
         service.createNewEvent(invalidDto as CreateEventDto, mockUser.userId),
       ).rejects.toThrow();

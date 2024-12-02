@@ -9,8 +9,9 @@ export class CreateEventDto {
   @MinLength(1, { message: 'description cannot be empty' })
   description: string;
 
+  @IsString()
+  city: string;
   @IsArray()
   @IsMongoId({ each: true })
   members: string[];
 }
-

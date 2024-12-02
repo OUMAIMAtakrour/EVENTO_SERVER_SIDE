@@ -69,7 +69,7 @@ export class AuthService {
   async generateUserTokens(userId) {
     const accessToken = this.jwtService.sign({ userId }, { expiresIn: '2h' });
     const refreshToken = uuidv4();
-    // await this.storeRefreshToken(refreshToken, userId);
+    await this.storeRefreshToken(refreshToken, userId);
 
     return { accessToken, refreshToken };
   }

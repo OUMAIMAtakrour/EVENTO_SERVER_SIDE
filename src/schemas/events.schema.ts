@@ -11,6 +11,8 @@ export class Events {
   title: string;
   @Prop({})
   description: string;
+  @Prop({ required: true })
+  city: string;
   @Prop({ types: [{ type: Types.ObjectId, ref: 'Users' }] })
   members: User[];
 }

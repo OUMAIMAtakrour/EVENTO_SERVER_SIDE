@@ -11,22 +11,34 @@ import {
   Post,
   Req,
   Patch,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 // import { Roles } from '../auth/roles.decorator';
 import { User, UserRole } from 'src/schemas/user.schema';
 import { Roles } from 'src/common/decorators/role.decorator';
+import { CreateAuthDto } from '../auth/dto/create-auth.dto';
+import { RolesGuard } from 'src/common/guards/roles.guard';
 
 @Controller('users')
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, RolesGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Patch('/profile')
-  async updateProfile(@Req() req, @Body() updateData: Partial<User>) {
-    return this.userService.updateProfile(req.user.userId, updateData);
+  @Post()
+  async createUser(@Body() create: CreateAuthDto, @Request() req) {
+    return this.userService.createUser(create);
   }
+
+  @Patch('/profile/:id')
+async updateProfile(
+  @Param('id') selectedUserId: string, 
+  @Body() updateData: Partial<User>,
+) {
+  return this.userService.updateProfile(selectedUserId, updateData);
+}
+
 
   @Get('/profile')
   async getProfile(@Req() req) {
@@ -34,21 +46,20 @@ export class UserController {
 
     return this.userService.getUserProfile(req.user.userId);
   }
-  @Delete('account')
-  async deleteAccount(@Req() req, @Body() { password }: { password: string }) {
-    return this.userService.deleteAccount(req.user.userId, password);
+  @Delete('account/:userId')
+  async deleteAccount(@Param('userId') userId: string) {
+    return this.userService.deleteAccount(userId); 
   }
+  @Get('list')
 
-  @Get()
-  @Roles(UserRole.ORGANIZER)
+  // @Roles(UserRole.ORGANIZER)
   async listUsers(
     @Req() req,
-    @Query('page') page?: number,
-    @Query('limit') limit?: number,
+   
   ) {
     console.log('Request User:', req.user);
 
-    return this.userService.listUsers(req.user.role, page, limit);
+    return this.userService.listUsers(req.user.role);
   }
 
   @Post('logout')

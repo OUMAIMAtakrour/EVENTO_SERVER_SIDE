@@ -1,6 +1,12 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateEventDto } from './create-event.dto';
-import { IsArray, IsMongoId, IsOptional, IsString, MinLength } from 'class-validator';
+import {
+  IsArray,
+  IsMongoId,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
 
 export class UpdateEventDto extends PartialType(CreateEventDto) {
   @IsString()
@@ -13,6 +19,8 @@ export class UpdateEventDto extends PartialType(CreateEventDto) {
   @IsOptional()
   description?: string;
 
+  @IsString()
+  city: string;
   @IsArray()
   @IsMongoId({ each: true })
   @IsOptional()

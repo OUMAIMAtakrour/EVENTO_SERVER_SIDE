@@ -13,20 +13,47 @@ import * as bcrypt from 'bcrypt';
 export class UserService {
   constructor(@InjectModel(User.name) private UserModel: Model<User>) {}
 
-  async updateProfile(userId: string, updateData: Partial<User>) {
+  async createUser(userData) {
     try {
+      if (userData.password) {
+        userData.password = await bcrypt.hash(userData.password, 10);
+      }
+
+      const newUser = new this.UserModel(userData);
+      const savedUser = await newUser.save();
+
+      const { password, ...userWithoutPassword } = savedUser.toObject();
+      return userWithoutPassword;
+    } catch (error) {
+      if (error.code === 11000) {
+        throw new BadRequestException('Email already exists');
+      }
+      throw new BadRequestException('Could not create user');
+    }
+  }
+  
+  async updateProfile(
+    selectedUserId: string,
+    updateData: Partial<User>,
+  ): Promise<User> {
+    try {
+      const user = await this.UserModel.findById(selectedUserId);
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
       if (updateData.password) {
         updateData.password = await bcrypt.hash(updateData.password, 10);
       }
 
       const updatedUser = await this.UserModel.findByIdAndUpdate(
-        userId,
+        selectedUserId,
         { $set: updateData },
-        { new: true },
-      ).select({ password: 0 });
+        { new: true }, 
+      ).select('-password'); 
 
       if (!updatedUser) {
-        throw new NotFoundException('User not found');
+        throw new NotFoundException('Failed to update user');
       }
 
       return updatedUser;
@@ -34,22 +61,19 @@ export class UserService {
       if (error.name === 'CastError') {
         throw new BadRequestException('Invalid user ID');
       }
-      throw new BadRequestException('Could not update profile');
+      throw new BadRequestException(error.message || 'Update failed');
     }
   }
 
-  async deleteAccount(userId: string, password: string) {
+  async deleteAccount(userId: string) {
+   
     const user = await this.UserModel.findById(userId);
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Incorrect password');
-    }
-
+  
     await this.UserModel.findByIdAndDelete(userId);
 
     return { message: 'Account deleted successfully' };
@@ -77,7 +101,7 @@ export class UserService {
   }
 
   async listUsers(currentUserRole: UserRole, page = 1, limit = 10) {
-    console.log('Current User Role:', currentUserRole); 
+    console.log('Current User Role:', currentUserRole);
     if (currentUserRole !== UserRole.ORGANIZER) {
       throw new UnauthorizedException('Not authorized to list users');
     }

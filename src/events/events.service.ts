@@ -22,6 +22,7 @@ export class EventsService {
     const newEvent = new this.eventModel({
       ...dto,
       title: dto.title.toLowerCase(),
+      city: dto.city,
       Owner: new Types.ObjectId(userId),
     });
 
