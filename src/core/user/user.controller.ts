@@ -16,7 +16,7 @@ import {
 import { UserService } from './user.service';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 // import { Roles } from '../auth/roles.decorator';
-import { User, UserRole } from 'src/schemas/user.schema';
+import { User, UserRole } from 'src/core/auth/schemas/user.schema';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { CreateAuthDto } from '../auth/dto/create-auth.dto';
 import { RolesGuard } from 'src/common/guards/roles.guard';
@@ -32,13 +32,12 @@ export class UserController {
   }
 
   @Patch('/profile/:id')
-async updateProfile(
-  @Param('id') selectedUserId: string, 
-  @Body() updateData: Partial<User>,
-) {
-  return this.userService.updateProfile(selectedUserId, updateData);
-}
-
+  async updateProfile(
+    @Param('id') selectedUserId: string,
+    @Body() updateData: Partial<User>,
+  ) {
+    return this.userService.updateProfile(selectedUserId, updateData);
+  }
 
   @Get('/profile')
   async getProfile(@Req() req) {
@@ -48,15 +47,12 @@ async updateProfile(
   }
   @Delete('account/:userId')
   async deleteAccount(@Param('userId') userId: string) {
-    return this.userService.deleteAccount(userId); 
+    return this.userService.deleteAccount(userId);
   }
   @Get('list')
 
   // @Roles(UserRole.ORGANIZER)
-  async listUsers(
-    @Req() req,
-   
-  ) {
+  async listUsers(@Req() req) {
     console.log('Request User:', req.user);
 
     return this.userService.listUsers(req.user.role);

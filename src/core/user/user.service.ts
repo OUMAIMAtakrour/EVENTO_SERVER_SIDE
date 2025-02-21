@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User, UserRole } from 'src/schemas/user.schema';
+import { User, UserRole } from 'src/core/auth/schemas/user.schema';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -31,7 +31,7 @@ export class UserService {
       throw new BadRequestException('Could not create user');
     }
   }
-  
+
   async updateProfile(
     selectedUserId: string,
     updateData: Partial<User>,
@@ -49,8 +49,8 @@ export class UserService {
       const updatedUser = await this.UserModel.findByIdAndUpdate(
         selectedUserId,
         { $set: updateData },
-        { new: true }, 
-      ).select('-password'); 
+        { new: true },
+      ).select('-password');
 
       if (!updatedUser) {
         throw new NotFoundException('Failed to update user');
@@ -66,14 +66,12 @@ export class UserService {
   }
 
   async deleteAccount(userId: string) {
-   
     const user = await this.UserModel.findById(userId);
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-  
     await this.UserModel.findByIdAndDelete(userId);
 
     return { message: 'Account deleted successfully' };

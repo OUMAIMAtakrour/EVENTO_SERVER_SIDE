@@ -6,12 +6,12 @@ import {
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserRole } from 'src/schemas/user.schema';
+import { User, UserRole } from 'src/core/auth/schemas/user.schema';
 import * as bcrypt from 'bcrypt';
 import { Model } from 'mongoose';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
-import { RefreshToken } from 'src/schemas/refresh-token.schema';
+import { RefreshToken } from 'src/core/auth/schemas/refresh-token.schema';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()

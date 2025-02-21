@@ -7,12 +7,19 @@ import { Mongoose } from 'mongoose';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 // import { config } from 'process';
-import { EventsModule } from './events/events.module';
 import config from './config/config';
 
 @Module({
   imports: [
+    GraphQLModule.forRoot<ApolloDriver>({
+      driver: ApolloDriver,
+      // playground: true,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      sortSchema: true,
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true,
@@ -23,10 +30,9 @@ import config from './config/config';
       useFactory: async (config) => ({
         secret: config.get('jwt.secret'),
       }),
-      global:true,
+      global: true,
 
-
-      inject:[ConfigService]
+      inject: [ConfigService],
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -37,7 +43,6 @@ import config from './config/config';
     }),
     UserModule,
     AuthModule,
-    EventsModule,
   ],
 
   controllers: [],
